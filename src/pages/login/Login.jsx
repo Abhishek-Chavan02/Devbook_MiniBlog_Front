@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../redux/actions/loginAction";
-import { useNavigate, Link } from "react-router-dom"; // import Link
+import { useNavigate, Link } from "react-router-dom"; 
+import { USER_SIGNUP_RESET } from "../../redux/constant";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -27,7 +28,9 @@ const Login = () => {
       navigate("/home");
     }
   }, [userInfo, navigate]);
-
+useEffect(() => {
+  dispatch({ type: USER_SIGNUP_RESET });
+}, [dispatch]);
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg p-8 w-96">

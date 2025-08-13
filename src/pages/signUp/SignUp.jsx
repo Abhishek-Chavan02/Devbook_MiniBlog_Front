@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { signup } from "../../redux/actions/signUpAction";
-import { useNavigate, Link } from "react-router-dom"; // import useNavigate
+import { useNavigate, Link } from "react-router-dom"; 
 
 const Signup = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // initialize navigate
+  const navigate = useNavigate(); 
 
   const { loading, error, success } = useSelector((state) => state.userSignup);
 
