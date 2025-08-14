@@ -1,6 +1,7 @@
+// Sidebar.js
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { UserIcon, LogoutIcon, MenuIcon, UsersIcon } from "@heroicons/react/outline";
+import { UserIcon, LogoutIcon, MenuIcon, UsersIcon, PencilAltIcon } from "@heroicons/react/outline";
 import { USER_LOGOUT } from "../../redux/constant";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -18,19 +19,30 @@ const Sidebar = () => {
     navigate("/login");
   };
 
-  const menuItems = [
+  let menuItems = [
     {
       name: "Profile",
       path: "profile",
       icon: <UserIcon className="h-5 w-5" />,
     },
-      {
+    {
       name: "User List",
       path: "user_list",
       icon: <UsersIcon className="h-5 w-5" />,
     },
-
+     {
+      name: "Blog",
+      path: "blog",
+      icon: <PencilAltIcon className="h-5 w-5" />,
+    },
+    
   ];
+
+  // ✅ Show "User List" only for roleId === "1001"
+  if (userInfo?.roleId !== "1001") {
+    menuItems = menuItems.filter((item) => item.name !== "User List");
+  }
+
   return (
     <div
       className={`${
@@ -38,9 +50,7 @@ const Sidebar = () => {
       } bg-blue-700 text-white min-h-screen flex flex-col transition-all duration-300`}
     >
       <div className="flex items-center justify-between p-4">
-        <h1 className={`text-lg font-bold ${!isOpen && "hidden"}`}>
-          Dashboard
-        </h1>
+        <h1 className={`text-lg font-bold ${!isOpen && "hidden"}`}>Dashboard</h1>
         <button onClick={() => setIsOpen(!isOpen)}>
           <MenuIcon className="h-6 w-6" />
         </button>
@@ -52,7 +62,7 @@ const Sidebar = () => {
             key={item.name}
             to={item.path}
             className={`flex items-center gap-3 p-2 rounded-md hover:bg-blue-800 transition ${
-              location.pathname === item.path ? "bg-blue-900" : ""
+              location.pathname.endsWith(item.path) ? "bg-blue-900" : ""
             }`}
           >
             {item.icon}
@@ -64,7 +74,7 @@ const Sidebar = () => {
       <div className="p-2">
         <button
           className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-800 w-full"
-          onClick={handleLogout} // ✅ moved onClick to button
+          onClick={handleLogout}
         >
           <LogoutIcon className="h-5 w-5" />
           {isOpen && <span>Logout</span>}

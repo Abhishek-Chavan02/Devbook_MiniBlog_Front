@@ -1,10 +1,12 @@
 import { Routes, Route } from 'react-router-dom';
-import Signup from '../pages/signUp/SignUp.jsx';
+
 import Login from '../pages/login/Login.jsx';
 import Home from '../pages/home/Home.jsx';
 import Profile from '../pages/home/Profile.jsx';
 import PrivateRoute from './PrivateRoute';
-import UserTable from '../pages/home/UserTable.jsx';
+import Signup from '../pages/signUp/signUp.jsx';
+import UserManagement from '../pages/home/UserManagement.jsx'; 
+import Blog from '../pages/Blog/index.jsx';
 
 const AppRouter = () => (
   <Routes>
@@ -12,11 +14,11 @@ const AppRouter = () => (
     <Route path="/login" element={<Login />} />
 
     {/* Private layout */}
-<Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>}>
-  <Route path="profile" element={<Profile />} />
-  <Route path="user_list" element={<UserTable />} />
-</Route>
-
+    <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>}>
+      <Route path="profile" element={<Profile />} />
+      <Route path="user_list" element={<UserManagement />} />
+      <Route path="blog" element={<Blog />} /> 
+    </Route>
   </Routes>
 );
 

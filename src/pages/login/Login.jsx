@@ -9,6 +9,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const { loading, error, userInfo } = useSelector((state) => state.userLogin);
+  console.log('userInfo: ', userInfo);
 
   const [formData, setFormData] = useState({
     email: "",
