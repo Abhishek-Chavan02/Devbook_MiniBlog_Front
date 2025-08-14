@@ -3,8 +3,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { UpdateUser, GetUserById } from "../../redux/actions/UserAction";
 
 const Profile = () => {
-  const { userInfo } = useSelector((state) => state.userLogin);
+  // const { userInfo } = useSelector((state) => state.userLogin);
+  const userInfo = localStorage.getItem("userInfo")
+  ? JSON.parse(localStorage.getItem("userInfo"))
+  : null;
+  console.log('userInfo: ', userInfo);
+  
   const { singleUser } = useSelector((state) => state.userList);
+  console.log('singleUser: ', singleUser);
   const dispatch = useDispatch();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -20,16 +26,16 @@ const Profile = () => {
     if (userInfo?.id) {
       dispatch(GetUserById(userInfo.id));
     }
-  }, [dispatch, userInfo?.id]);
+  }, []);
 
   // Update formData when singleUser changes
   useEffect(() => {
     if (singleUser) {
       setFormData({
-        firstname: singleUser.firstname,
-        lastname: singleUser.lastname,
-        username: singleUser.username,
-        email: singleUser.email,
+        firstname: singleUser.user.firstname,
+        lastname: singleUser.user.lastname,
+        username: singleUser.user.username,
+        email: singleUser.user.email,
       });
     }
   }, [singleUser]);
@@ -53,10 +59,10 @@ const Profile = () => {
 
       {/* Display profile info */}
       <div className="bg-white shadow rounded p-4 space-y-2 border">
-        <p><span className="font-semibold">First Name:</span> {singleUser?.firstname}</p>
-        <p><span className="font-semibold">Last Name:</span> {singleUser?.lastname}</p>
-        <p><span className="font-semibold">Username:</span> {singleUser?.username}</p>
-        <p><span className="font-semibold">Email:</span> {singleUser?.email}</p>
+        <p><span className="font-semibold">First Name:</span> {singleUser?.user?.firstname}</p>
+        <p><span className="font-semibold">Last Name:</span> {singleUser?.user?.lastname}</p>
+        <p><span className="font-semibold">Username:</span> {singleUser?.user?.username}</p>
+        <p><span className="font-semibold">Email:</span> {singleUser?.user?.email}</p>
       </div>
 
       <button
