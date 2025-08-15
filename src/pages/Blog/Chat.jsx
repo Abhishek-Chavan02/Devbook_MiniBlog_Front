@@ -2,8 +2,19 @@ import React, { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CreatePost from "./CreatePost";
 import ChatInput from "./ChatInput";
-import { DeleteBlog, GetBlogs, UpdateBlog } from "../../redux/actions/BlogAction";
-import { TrashIcon, HeartIcon, ChatAltIcon, PencilAltIcon } from "@heroicons/react/solid";
+import {
+  DeleteBlog,
+  GetBlogs,
+  ToggleLike,
+  UpdateBlog,
+  CreateBlog,
+} from "../../redux/actions/BlogAction";
+import {
+  TrashIcon,
+  HeartIcon,
+  ChatAltIcon,
+  PencilAltIcon,
+} from "@heroicons/react/solid";
 
 const Chat = () => {
   const dispatch = useDispatch();
@@ -11,44 +22,80 @@ const Chat = () => {
   const [posts, setPosts] = useState([]);
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [message, setMessage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const scrollRef = useRef(null);
 
   const userInfo = localStorage.getItem("userInfo")
     ? JSON.parse(localStorage.getItem("userInfo"))
     : null;
 
-  // Fetch blogs on mount
+  // Fetch blogs/messages from backend
   useEffect(() => {
     dispatch(GetBlogs());
   }, [dispatch]);
 
-  // Map blogs to post structure
+  // Map blogs from backend to posts/messages
   useEffect(() => {
     if (blogs && blogs.length > 0) {
-      const blogPosts = blogs.map((b) => ({
-        type: "post",
-        title: b.title || b.tag,
-        description: b.description,
+      const mappedPosts = blogs.map((b) => ({
+        type: b.tag || b.description ? "post" : "message", // Detect type
+        title: b.tag || "",
+        tag: b.tag,
+        description: b.description || "",
+        content: b.message || "",
         likeCount: b.likeCount || 0,
         commentCount: b.messageCount || 0,
         id: b._id,
         createdBy: b.createdBy,
+        likes: b.likes || [],
+        isLiked: b.isLiked || false,
       }));
-      setPosts(blogPosts);
+      setPosts(mappedPosts);
     }
   }, [blogs]);
 
-  // Handle adding new message
-  const handleSendMessage = () => {
+  // Handle sending a message
+  const handleSendMessage = async () => {
     if (!message.trim()) return;
-    setPosts([...posts, { type: "message", content: message, likeCount: 0, commentCount: 0 }]);
-    setMessage("");
+    try {
+      const payload = { message, createdBy: userInfo.id };
+      const res = await dispatch(CreateBlog(payload));
+      const newPost = {
+        type: "message",
+        content: res.blog.message,
+        likeCount: res.blog.likeCount || 0,
+        commentCount: 0,
+        id: res.blog._id,
+        createdBy: res.blog.createdBy,
+        likes: res.blog.likes || [],
+      };
+      setPosts([...posts, newPost]);
+      setMessage("");
+    } catch (err) {
+      console.error("Failed to send message", err);
+    }
   };
 
-  // Add new blog to UI
-  const handleAddPost = (post) => {
-    setPosts([{ ...post, type: "post", likeCount: 0, commentCount: 0 }, ...posts]);
-    setShowCreatePost(false);
+  // Add a blog post
+  const handleAddPost = async (post) => {
+    try {
+      const payload = { tag: post.tag, description: post.description, createdBy: userInfo.id };
+      const res = await dispatch(CreateBlog(payload));
+      const newPost = {
+        type: "post",
+        title: res.blog.tag,
+        description: res.blog.description,
+        likeCount: res.blog.likeCount || 0,
+        commentCount: 0,
+        id: res.blog._id,
+        createdBy: res.blog.createdBy,
+        likes: res.blog.likes || [],
+      };
+      setPosts([newPost, ...posts]);
+      setShowCreatePost(false);
+    } catch (err) {
+      console.error("Failed to create post", err);
+    }
   };
 
   // Delete post
@@ -68,28 +115,44 @@ const Chat = () => {
     try {
       await dispatch(UpdateBlog(postId, updatedContent));
       setPosts((prev) =>
-        prev.map((p) =>
-          p.id === postId ? { ...p, ...updatedContent } : p
-        )
+        prev.map((p) => (p.id === postId ? { ...p, ...updatedContent } : p))
       );
     } catch (err) {
       console.error("Failed to update blog", err);
     }
   };
 
-  // Auto scroll
+  // Auto scroll to bottom for new messages
   useEffect(() => {
     scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight);
   }, [posts]);
 
+  // Filter posts by tag (messages always show)
+  const filteredPosts = posts.filter(
+    (post) =>
+      post.type === "message" ||
+      post.tag?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="flex flex-col h-full">
+      {/* Search bar */}
+      <div className="p-4 flex justify-end">
+        <input
+          type="text"
+          placeholder="Search by tag..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border rounded px-3 py-1 text-sm w-60 focus:outline-none focus:ring focus:border-blue-300"
+        />
+      </div>
+
       <div className="flex-1 overflow-y-auto p-4 space-y-4" ref={scrollRef}>
-        {posts.map((post) => {
+        {filteredPosts.map((post) => {
           const canEditOrDelete =
             userInfo &&
-            (userInfo.roleId === "1001" ||
-              (post.createdBy && userInfo.id === post.createdBy._id));
+            post.createdBy &&
+            userInfo.id === post.createdBy._id; // Only creator can edit/delete
 
           return (
             <PostCard
@@ -111,7 +174,10 @@ const Chat = () => {
       />
 
       {showCreatePost && (
-        <CreatePost onPost={handleAddPost} onClose={() => setShowCreatePost(false)} />
+        <CreatePost
+          onPost={handleAddPost}
+          onClose={() => setShowCreatePost(false)}
+        />
       )}
     </div>
   );
@@ -124,31 +190,47 @@ export default Chat;
 // ----------------------
 const PostCard = ({ post, canEditOrDelete, onDelete, onUpdate }) => {
   const dispatch = useDispatch();
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(post.likeCount || 0);
-  const [commentCount] = useState(post.commentCount || 0);
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(post.title);
   const [editDescription, setEditDescription] = useState(post.description);
 
+  const userInfo = localStorage.getItem("userInfo")
+    ? JSON.parse(localStorage.getItem("userInfo"))
+    : null;
+
+  const blogState = useSelector((state) => state.blogList.blogs);
+  const currentBlog = blogState.find((b) => b._id === post.id) || post;
+
+  const isLikedByCurrentUser =
+    userInfo && currentBlog.likes
+      ? currentBlog.likes.includes(userInfo.id)
+      : false;
+
+  const liked = isLikedByCurrentUser || currentBlog.isLiked || false;
+  const likeCount = currentBlog.likeCount || 0;
+
   const toggleLike = () => {
-    setLiked(!liked);
-    setLikeCount(likeCount + (liked ? -1 : 1));
+    if (userInfo && post.id) {
+      dispatch(ToggleLike(post.id, userInfo.id)).catch((error) => {
+        console.error("Error toggling like:", error);
+      });
+    }
   };
 
   const saveEdit = async () => {
     if (!post.id) return;
-    const updatedData = {
-      tag: editTitle,
-      description: editDescription,
-    };
+    const updatedData =
+      post.type === "post"
+        ? { tag: editTitle, description: editDescription }
+        : { message: editDescription }; // For messages
     try {
       await dispatch(UpdateBlog(post.id, updatedData));
       if (onUpdate) {
-        onUpdate({
-          title: editTitle,
-          description: editDescription,
-        });
+        onUpdate(
+          post.type === "post"
+            ? { title: editTitle, description: editDescription }
+            : { content: editDescription }
+        );
       }
       setIsEditing(false);
     } catch (err) {
@@ -189,18 +271,39 @@ const PostCard = ({ post, canEditOrDelete, onDelete, onUpdate }) => {
         </>
       )}
 
-      {post.type === "message" && <p className="text-gray-800">{post.content}</p>}
+      {post.type === "message" && (
+        <>
+          {isEditing ? (
+            <textarea
+              className="border rounded p-2 mt-1 w-full"
+              value={editDescription || post.content}
+              onChange={(e) => setEditDescription(e.target.value)}
+            />
+          ) : (
+            <p className="text-gray-800">{post.content}</p>
+          )}
+        </>
+      )}
 
       <div className="flex gap-4 mt-3 items-center">
-        <div className="flex items-center gap-1 cursor-pointer" onClick={toggleLike}>
-          <HeartIcon className={`h-5 w-5 ${liked ? "text-red-500" : "text-gray-400"}`} />
+        {/* Like Button */}
+        <div
+          className="flex items-center gap-1 cursor-pointer"
+          onClick={toggleLike}
+        >
+          <HeartIcon
+            className={`h-5 w-5 ${liked ? "text-red-500" : "text-gray-400"}`}
+          />
           <span className="text-sm">{likeCount}</span>
         </div>
+
+        {/* Comment Count */}
         <div className="flex items-center gap-1 cursor-pointer">
           <ChatAltIcon className="h-5 w-5 text-gray-400" />
-          <span className="text-sm">{commentCount}</span>
+          <span className="text-sm">{post.commentCount || 0}</span>
         </div>
 
+        {/* Edit/Delete */}
         {canEditOrDelete && (
           <>
             <div

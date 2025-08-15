@@ -5,32 +5,32 @@ import { CreateBlog } from "../../redux/actions/BlogAction";
 
 const CreatePost = ({ onClose }) => {
   const dispatch = useDispatch();
-  
+
   const [tag, setTag] = useState("");
   const [description, setDescription] = useState("");
-const userFromStorage = localStorage.getItem("userInfo")
-? JSON.parse(localStorage.getItem("userInfo"))
-: null;
-console.log('userFromStorage: ', userFromStorage);
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!tag || !description || !userFromStorage?.id) return; // make sure ID exists
+  const userFromStorage = localStorage.getItem("userInfo")
+    ? JSON.parse(localStorage.getItem("userInfo"))
+    : null;
+  console.log('userFromStorage: ', userFromStorage);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!tag || !description || !userFromStorage?.id) return; // make sure ID exists
 
-  try {
-    const blogData = {
-      tag,
-      description,
-      createdBy: userFromStorage.id, // pass user ID here
-    };
+    try {
+      const blogData = {
+        tag,
+        description,
+        createdBy: userFromStorage.id, // pass user ID here
+      };
 
-    await dispatch(CreateBlog(blogData));
-    setTag("");
-    setDescription("");
-    onClose(); // Close modal after successful creation
-  } catch (error) {
-    console.error("Error creating blog:", error);
-  }
-};
+      await dispatch(CreateBlog(blogData));
+      setTag("");
+      setDescription("");
+      onClose(); // Close modal after successful creation
+    } catch (error) {
+      console.error("Error creating blog:", error);
+    }
+  };
 
 
   return (
@@ -62,8 +62,8 @@ const handleSubmit = async (e) => {
             >
               Cancel
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
               Publish

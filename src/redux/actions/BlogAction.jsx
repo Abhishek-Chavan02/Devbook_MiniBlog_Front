@@ -16,6 +16,9 @@ import {
   DELETE_BLOG_REQUEST,
   DELETE_BLOG_SUCCESS,
   DELETE_BLOG_FAIL,
+  TOGGLE_LIKE_REQUEST,
+  TOGGLE_LIKE_SUCCESS,
+  TOGGLE_LIKE_FAIL,
 } from "../constant";
 
 // CREATE blog
@@ -121,6 +124,31 @@ export const DeleteBlog = (id) => async (dispatch) => {
         error.response?.data?.message || 
         error.message || 
         "Failed to delete blog",
+    });
+  }
+};
+
+export const ToggleLike = (blogId, userId) => async (dispatch) => {
+  try {
+    dispatch({ type: TOGGLE_LIKE_REQUEST });
+
+    const { data } = await axiosInstance.put(`/like/${blogId}/${userId}`);
+
+    dispatch({
+      type: TOGGLE_LIKE_SUCCESS,
+      payload: {
+        blogId,
+        likeCount: data.likeCount,
+        isLiked: data.isLiked,
+      },
+    });
+  } catch (error) {
+    dispatch({
+      type: TOGGLE_LIKE_FAIL,
+      payload:
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to toggle like",
     });
   }
 };

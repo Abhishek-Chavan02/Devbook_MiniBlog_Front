@@ -14,7 +14,10 @@ import {
   DELETE_BLOG_REQUEST,
   DELETE_BLOG_SUCCESS,
   DELETE_BLOG_FAIL,
-//   RESET_BLOG_STATE
+  TOGGLE_LIKE_SUCCESS,
+  TOGGLE_LIKE_FAIL,
+  TOGGLE_LIKE_REQUEST,
+  //   RESET_BLOG_STATE
 } from '../constant';
 
 const initialState = {
@@ -25,16 +28,18 @@ const initialState = {
   success: false,
   operation: null, // Tracks current operation ('create', 'update', 'delete')
   totalBlogs: 0, // For pagination support
-  currentPage: 1 // For pagination support
+  currentPage: 1,
+  likeCount:0,
+  isLiked:false// For pagination support
 };
 
 export const blogReducer = (state = initialState, action) => {
   switch (action.type) {
     // Create Blog Cases
     case CREATE_BLOG_REQUEST:
-      return { 
-        ...state, 
-        loading: true, 
+      return {
+        ...state,
+        loading: true,
         success: false,
         operation: 'create'
       };
@@ -50,65 +55,65 @@ export const blogReducer = (state = initialState, action) => {
       };
 
     case CREATE_BLOG_FAIL:
-      return { 
-        ...state, 
-        loading: false, 
+      return {
+        ...state,
+        loading: false,
         error: action.payload,
         operation: null
       };
 
     // Get All Blogs Cases
     case GET_BLOGS_REQUEST:
-      return { 
-        ...state, 
+      return {
+        ...state,
         loading: true,
-        error: null 
+        error: null
       };
 
     case GET_BLOGS_SUCCESS:
-      return { 
-        ...state, 
-        loading: false, 
+      return {
+        ...state,
+        loading: false,
         blogs: action.payload.blogs,
         totalBlogs: action.payload.totalCount || action.payload.blogs.length,
         currentPage: action.payload.currentPage || 1
       };
 
     case GET_BLOGS_FAIL:
-      return { 
-        ...state, 
-        loading: false, 
-        error: action.payload 
+      return {
+        ...state,
+        loading: false,
+        error: action.payload
       };
 
     // Get Single Blog Cases
     case GET_BLOG_REQUEST:
-      return { 
-        ...state, 
-        loading: true, 
+      return {
+        ...state,
+        loading: true,
         currentBlog: null,
-        error: null 
+        error: null
       };
 
     case GET_BLOG_SUCCESS:
-      return { 
-        ...state, 
-        loading: false, 
-        currentBlog: action.payload.blog 
+      return {
+        ...state,
+        loading: false,
+        currentBlog: action.payload.blog
       };
 
     case GET_BLOG_FAIL:
-      return { 
-        ...state, 
-        loading: false, 
-        error: action.payload 
+      return {
+        ...state,
+        loading: false,
+        error: action.payload
       };
 
     // Update Blog Cases
     case UPDATE_BLOG_REQUEST:
-      return { 
-        ...state, 
-        loading: true, 
+      return {
+        ...state,
+        loading: true,
         success: false,
         operation: 'update'
       };
@@ -119,27 +124,27 @@ export const blogReducer = (state = initialState, action) => {
         loading: false,
         success: true,
         operation: null,
-        blogs: state.blogs.map(blog => 
+        blogs: state.blogs.map(blog =>
           blog._id === action.payload._id ? action.payload : blog
         ),
         currentBlog: action.payload
       };
 
     case UPDATE_BLOG_FAIL:
-      return { 
-        ...state, 
-        loading: false, 
+      return {
+        ...state,
+        loading: false,
         error: action.payload,
         operation: null
       };
 
     // Delete Blog Cases
     case DELETE_BLOG_REQUEST:
-      return { 
-        ...state, 
-        loading: true, 
+      return {
+        ...state,
+        loading: true,
         success: false,
-        operation: 'delete' 
+        operation: 'delete'
       };
 
     case DELETE_BLOG_SUCCESS:
@@ -154,11 +159,50 @@ export const blogReducer = (state = initialState, action) => {
       };
 
     case DELETE_BLOG_FAIL:
-      return { 
-        ...state, 
-        loading: false, 
+      return {
+        ...state,
+        loading: false,
         error: action.payload,
         operation: null
+      };
+
+    case TOGGLE_LIKE_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null
+      };
+
+    case TOGGLE_LIKE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        blogs: state.blogs.map(blog =>
+          blog._id === action.payload.blogId
+            ? {
+              ...blog,
+              likeCount: action.payload.likeCount,
+              isLiked: action.payload.isLiked
+            }
+            : blog
+        ),
+        // Update currentBlog if it matches
+        currentBlog: state.currentBlog && state.currentBlog._id === action.payload.blogId
+          ? {
+            ...state.currentBlog,
+            likeCount: action.payload.likeCount,
+            isLiked: action.payload.isLiked
+          }
+          : state.currentBlog,
+        // Store the API message
+        message: action.payload.message
+      };
+
+    case TOGGLE_LIKE_FAIL:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload
       };
 
     // Reset state
