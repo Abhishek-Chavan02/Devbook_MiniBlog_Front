@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import UserTable from "./UserTable";
 import { useDispatch } from "react-redux";
-import { UpdateUser, GetUser } from "../../redux/actions/UserAction";
+import {
+  UpdateUser,
+  GetUser,
+  DeleteUser,
+} from "../../redux/actions/UserAction";
+import Swal from "sweetalert2";
 
 const UserManagement = () => {
-  
   const [editUser, setEditUser] = useState(null);
   const [formData, setFormData] = useState({
     firstname: "",
@@ -16,12 +20,41 @@ const UserManagement = () => {
   const dispatch = useDispatch();
 
   const handleEdit = (user) => {
-    setEditUser(user);
-    setFormData({
-      firstname: user.firstname,
-      lastname: user.lastname,
-      username: user.username,
-      email: user.email,
+    Swal.fire({
+      title: "Edit User?",
+      text: `Do you want to edit ${user.firstname} ${user.lastname}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes, edit",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setEditUser(user);
+        setFormData({
+          firstname: user.firstname,
+          lastname: user.lastname,
+          username: user.username,
+          email: user.email,
+        });
+      }
+    });
+  };
+
+  const handleDelete = (userId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await dispatch(DeleteUser(userId));
+        await dispatch(GetUser());
+        Swal.fire("Deleted!", "The user has been deleted.", "success");
+      }
     });
   };
 
@@ -38,16 +71,17 @@ const UserManagement = () => {
     if (!editUser?._id) return;
 
     await dispatch(UpdateUser(editUser._id, formData));
-    await dispatch(GetUser()); // Refresh list after update
+    await dispatch(GetUser());
     setEditUser(null);
+
+    Swal.fire("Success!", "User updated successfully!", "success");
   };
 
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">User Management</h2>
-      <UserTable onEdit={handleEdit} />
+      <UserTable onEdit={handleEdit} onDelete={handleDelete} />
 
-      {/* Modal */}
       {editUser && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-96">

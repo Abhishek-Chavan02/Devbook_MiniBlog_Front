@@ -1,14 +1,14 @@
+import Swal from "sweetalert2";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { signup } from "../../redux/actions/signUpAction";
-import { useNavigate, Link } from "react-router-dom"; 
+import { useNavigate, Link } from "react-router-dom";
 
 const Signup = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const { loading, error, success } = useSelector((state) => state.userSignup);
-
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
@@ -25,12 +25,26 @@ const Signup = () => {
     dispatch(signup(formData));
   };
 
-  // Redirect to login after successful signup
   useEffect(() => {
     if (success) {
-      navigate("/login"); // redirect to login page
+      Swal.fire({
+        icon: "success",
+        title: "Signup Successful!",
+        text: "Redirecting to login...",
+        timer: 2000,
+        showConfirmButton: false,
+      }).then(() => {
+        navigate("/login");
+      });
     }
-  }, [success, navigate]);
+    if (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Signup Failed",
+        text: error,
+      });
+    }
+  }, [success, error, navigate]);
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -89,13 +103,6 @@ const Signup = () => {
         >
           {loading ? "Signing up..." : "Signup"}
         </button>
-
-        {error && <p className="text-red-500 mt-3 text-center">{error}</p>}
-        {success && (
-          <p className="text-green-500 mt-3 text-center">
-            Signup Successful! Redirecting to Login...
-          </p>
-        )}
 
         <p className="text-center mt-4 text-gray-600">
           Already have an account?{" "}

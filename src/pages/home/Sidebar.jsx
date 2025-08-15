@@ -1,9 +1,9 @@
-// Sidebar.js
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { UserIcon, LogoutIcon, MenuIcon, UsersIcon, PencilAltIcon } from "@heroicons/react/outline";
 import { USER_LOGOUT } from "../../redux/constant";
 import { useDispatch, useSelector } from "react-redux";
+import Swal from "sweetalert2";
 
 const Sidebar = () => {
   const { userInfo } = useSelector((state) => state.userLogin);
@@ -12,12 +12,20 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
 
-  const handleLogout = () => {
+const handleLogout = () => {
+  Swal.fire({
+    icon: "success",
+    title: "Logged Out",
+    text: "You have been logged out successfully.",
+    timer: 1500,
+    showConfirmButton: false,
+  }).then(() => {
     dispatch({ type: USER_LOGOUT });
     localStorage.removeItem("token");
     localStorage.removeItem("userInfo");
     navigate("/login");
-  };
+  });
+};
 
   let menuItems = [
     {
@@ -38,7 +46,6 @@ const Sidebar = () => {
     
   ];
 
-  // ✅ Show "User List" only for roleId === "1001"
   if (userInfo?.roleId !== "1001") {
     menuItems = menuItems.filter((item) => item.name !== "User List");
   }

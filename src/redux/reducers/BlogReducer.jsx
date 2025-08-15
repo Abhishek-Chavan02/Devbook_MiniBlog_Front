@@ -186,7 +186,6 @@ export const blogReducer = (state = initialState, action) => {
             }
             : blog
         ),
-        // Update currentBlog if it matches
         currentBlog: state.currentBlog && state.currentBlog._id === action.payload.blogId
           ? {
             ...state.currentBlog,
@@ -194,7 +193,6 @@ export const blogReducer = (state = initialState, action) => {
             isLiked: action.payload.isLiked
           }
           : state.currentBlog,
-        // Store the API message
         message: action.payload.message
       };
 
@@ -204,14 +202,6 @@ export const blogReducer = (state = initialState, action) => {
         loading: false,
         error: action.payload
       };
-
-    // Reset state
-    // case RESET_BLOG_STATE:
-    //   return {
-    //     ...initialState,
-    //     blogs: state.blogs, // Keep existing blogs
-    //     totalBlogs: state.totalBlogs // Keep total count
-    //   };
 
     default:
       return state;

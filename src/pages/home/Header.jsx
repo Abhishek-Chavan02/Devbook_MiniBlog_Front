@@ -4,7 +4,6 @@ import { BellIcon, UserCircleIcon } from "@heroicons/react/outline";
 const Header = ({ title }) => {
   return (
     <header className="bg-white shadow-md px-6 py-3 flex justify-between items-center">
-      {/* Page Title */}
       <h1 className="text-xl font-semibold">{title}</h1>
 
       {/* Right Section */}

@@ -3,14 +3,13 @@ import { useSelector, useDispatch } from "react-redux";
 import { UpdateUser, GetUserById } from "../../redux/actions/UserAction";
 
 const Profile = () => {
-  // const { userInfo } = useSelector((state) => state.userLogin);
   const userInfo = localStorage.getItem("userInfo")
-  ? JSON.parse(localStorage.getItem("userInfo"))
-  : null;
-  console.log('userInfo: ', userInfo);
-  
+    ? JSON.parse(localStorage.getItem("userInfo"))
+    : null;
+  console.log("userInfo: ", userInfo);
+
   const { singleUser } = useSelector((state) => state.userList);
-  console.log('singleUser: ', singleUser);
+  console.log("singleUser: ", singleUser);
   const dispatch = useDispatch();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -21,14 +20,12 @@ const Profile = () => {
     email: "",
   });
 
-  // Fetch user by ID on component mount
   useEffect(() => {
     if (userInfo?.id) {
       dispatch(GetUserById(userInfo.id));
     }
   }, []);
 
-  // Update formData when singleUser changes
   useEffect(() => {
     if (singleUser) {
       setFormData({
@@ -49,7 +46,7 @@ const Profile = () => {
     if (!userInfo?.id) return;
 
     await dispatch(UpdateUser(userInfo.id, formData));
-    await dispatch(GetUserById(userInfo.id)); // refresh updated data
+    await dispatch(GetUserById(userInfo.id));
     setIsEditing(false);
   };
 
@@ -57,12 +54,23 @@ const Profile = () => {
     <div className="p-6 max-w-lg mx-auto">
       <h1 className="text-2xl font-bold mb-4">Profile Page</h1>
 
-      {/* Display profile info */}
       <div className="bg-white shadow rounded p-4 space-y-2 border">
-        <p><span className="font-semibold">First Name:</span> {singleUser?.user?.firstname}</p>
-        <p><span className="font-semibold">Last Name:</span> {singleUser?.user?.lastname}</p>
-        <p><span className="font-semibold">Username:</span> {singleUser?.user?.username}</p>
-        <p><span className="font-semibold">Email:</span> {singleUser?.user?.email}</p>
+        <p>
+          <span className="font-semibold">First Name:</span>{" "}
+          {singleUser?.user?.firstname}
+        </p>
+        <p>
+          <span className="font-semibold">Last Name:</span>{" "}
+          {singleUser?.user?.lastname}
+        </p>
+        <p>
+          <span className="font-semibold">Username:</span>{" "}
+          {singleUser?.user?.username}
+        </p>
+        <p>
+          <span className="font-semibold">Email:</span>{" "}
+          {singleUser?.user?.email}
+        </p>
       </div>
 
       <button
@@ -72,7 +80,6 @@ const Profile = () => {
         Edit Profile
       </button>
 
-      {/* Edit Modal */}
       {isEditing && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-96">

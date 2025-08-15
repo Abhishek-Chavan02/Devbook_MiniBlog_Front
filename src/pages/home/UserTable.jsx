@@ -12,14 +12,26 @@ const UserTable = ({ onEdit }) => {
 
   const { loading, error, users } = useSelector((state) => state.userList);
 
-  const handleDelete = async (user) => {
-    await dispatch(DeleteUser(user._id));
-    dispatch(GetUser());
+ const handleDelete = async (user) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: `You are about to delete ${user.firstname} ${user.lastname}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
+      await dispatch(DeleteUser(user._id));
+      dispatch(GetUser());
+      Swal.fire("Deleted!", "User has been deleted.", "success");
+    }
   };
 
   return (
     <div className="overflow-x-auto">
-      {/* Desktop Table */}
       <div className="hidden md:block">
         <table className="min-w-full border border-gray-200">
           <thead>
@@ -42,7 +54,7 @@ const UserTable = ({ onEdit }) => {
               </tr>
             ) : users?.length > 0 ? (
               users.map((u) => (
-                <tr key={u._id} className="hover:bg-gray-50">
+                <tr key={u._id} className="hover:bg-gray-50 text-center">
                   <td className="py-2 px-4 border-b">{u.firstname}</td>
                   <td className="py-2 px-4 border-b">{u.lastname}</td>
                   <td className="py-2 px-4 border-b">{u.username}</td>
@@ -78,7 +90,7 @@ const UserTable = ({ onEdit }) => {
           <p className="text-center text-red-500">{error}</p>
         ) : users?.length > 0 ? (
           users.map((u) => (
-            <div key={u._id} className="border rounded-lg p-4 shadow-sm bg-white">
+            <div key={u._id} className="border rounded-lg p-4 shadow-sm bg-white text-c">
               <p><span className="font-semibold">First Name:</span> {u.firstname}</p>
               <p><span className="font-semibold">Last Name:</span> {u.lastname}</p>
               <p><span className="font-semibold">Username:</span> {u.username}</p>

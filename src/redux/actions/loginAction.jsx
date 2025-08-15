@@ -16,7 +16,6 @@ export const login = (formData) => async (dispatch) => {
       payload: data,
     });
 
-    // Store token and user in localStorage
     localStorage.setItem("token", data.token);
     localStorage.setItem("userInfo", JSON.stringify(data.user));
   } catch (err) {
