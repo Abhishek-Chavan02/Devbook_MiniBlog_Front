@@ -80,7 +80,7 @@ const handleLogout = () => {
 
       <div className="p-2">
         <button
-          className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-800 w-full"
+          className="flex items-center gap-3 p-2 rounded-md hover:bg-blue-800 w-full cursor-pointer"
           onClick={handleLogout}
         >
           <LogoutIcon className="h-5 w-5" />

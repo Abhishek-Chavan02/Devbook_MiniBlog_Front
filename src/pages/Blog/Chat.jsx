@@ -353,13 +353,11 @@ const PostCard = ({ post, canEditOrDelete, onDelete, onUpdate }) => {
   const currentBlog = blogState.find((b) => b._id === post.id) || post;
   const creator = post.createdBy || currentBlog.createdBy;
   
-  // Initialize isLiked based on whether current user has liked the post
   const [isLiked, setIsLiked] = useState(
     userInfo && currentBlog.likes ? currentBlog.likes.includes(userInfo.id) : false
   );
   const [likeCount, setLikeCount] = useState(currentBlog.likeCount || 0);
 
-  // Update like status when currentBlog changes
   useEffect(() => {
     if (currentBlog && userInfo) {
       setIsLiked(currentBlog.likes ? currentBlog.likes.includes(userInfo.id) : false);
@@ -367,27 +365,23 @@ const PostCard = ({ post, canEditOrDelete, onDelete, onUpdate }) => {
     }
   }, [currentBlog, userInfo]);
 
-const toggleLike = () => {
-  if (userInfo && post.id) {
-    // Optimistic UI update
-    const newLikeStatus = !isLiked;
-    setIsLiked(newLikeStatus);
-    setLikeCount(newLikeStatus ? likeCount + 1 : likeCount - 1);
-    
-    dispatch(ToggleLike(post.id, userInfo.id))
-      .then(() => {
-        // Reload page after successful like toggle
-        window.location.reload();
-      })
-      .catch((error) => {
-        // Revert on error
-        setIsLiked(!newLikeStatus);
-        setLikeCount(newLikeStatus ? likeCount : likeCount + 1);
-        console.error("Error toggling like:", error);
-      });
-  }
-};
-
+  const toggleLike = () => {
+    if (userInfo && post.id) {
+      const newLikeStatus = !isLiked;
+      setIsLiked(newLikeStatus);
+      setLikeCount(newLikeStatus ? likeCount + 1 : likeCount - 1);
+      
+      dispatch(ToggleLike(post.id, userInfo.id))
+        .then(() => {
+          window.location.reload();
+        })
+        .catch((error) => {
+          setIsLiked(!newLikeStatus);
+          setLikeCount(newLikeStatus ? likeCount : likeCount + 1);
+          console.error("Error toggling like:", error);
+        });
+    }
+  };
 
   const saveEdit = async () => {
     if (!post.id) return;
@@ -412,7 +406,6 @@ const toggleLike = () => {
 
   return (
     <div className="relative bg-white rounded-lg shadow p-4 flex flex-col">
-      {/* Creator information - shows name with admin badge if applicable */}
       <div className="absolute top-2 right-4 flex items-center">
         {creator ? (
           <>
@@ -430,7 +423,6 @@ const toggleLike = () => {
         )}
       </div>
 
-      {/* Post/message content */}
       {post.type === "post" ? (
         isEditing ? (
           <>
@@ -467,19 +459,18 @@ const toggleLike = () => {
         <p className="text-gray-800 whitespace-pre-line">{post.content}</p>
       )}
 
-      {/* Action buttons */}
       <div className="flex gap-4 mt-3 items-center pt-2 border-t border-gray-100">
         <div
           className="flex items-center gap-1 cursor-pointer hover:text-red-500 transition-colors"
           onClick={toggleLike}
         >
           <HeartIcon
-            className={`h-5 w-5 ${isLiked ? "text-red-500 fill-current" : "text-gray-400"}`}
+            className={`h-5 w-5 cursor-pointer ${isLiked ? "text-red-500 fill-current" : "text-gray-400"}`}
           />
           <span className="text-sm">{likeCount}</span>
         </div>
 
-        {canEditOrDelete && (
+        {(canEditOrDelete || (userInfo?.roleId === "1001" || userInfo?.role === "admin")) && (
           <div className="flex items-center gap-2 ml-auto">
             {isEditing ? (
               <>
@@ -502,7 +493,7 @@ const toggleLike = () => {
                 className="text-blue-500 hover:text-blue-700"
                 title="Edit"
               >
-                <PencilAltIcon className="h-5 w-5" />
+                <PencilAltIcon className="h-5 w-5 cursor-pointer" />
               </button>
             )}
             <button
@@ -510,7 +501,7 @@ const toggleLike = () => {
               className="text-red-500 hover:text-red-700"
               title="Delete"
             >
-              <TrashIcon className="h-5 w-5" />
+              <TrashIcon className="h-5 w-5 cursor-pointer" />
             </button>
           </div>
         )}
