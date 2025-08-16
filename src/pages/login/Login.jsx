@@ -16,11 +16,32 @@ const Login = () => {
     password: "",
   });
 
+  const [errors, setErrors] = useState({}); // validation errors
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" }); // clear error when typing
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Invalid email address";
+    }
+    if (!formData.password.trim()) {
+      newErrors.password = "Password is required";
+    }
+    return newErrors;
   };
 
   const handleLogin = () => {
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
     dispatch(login(formData));
   };
 
@@ -47,27 +68,36 @@ const Login = () => {
       <div className="bg-white shadow-lg rounded-lg p-8 w-96">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
+        {/* Email */}
         <input
           type="email"
           name="email"
           placeholder="Email"
           value={formData.email}
           onChange={handleChange}
-          className="border border-gray-300 p-2 rounded w-full mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className={`border p-2 rounded w-full mb-1 focus:outline-none focus:ring-2 ${
+            errors.email ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+          }`}
         />
+        {errors.email && <p className="text-red-500 text-sm mb-2">{errors.email}</p>}
+
+        {/* Password */}
         <input
           type="password"
           name="password"
           placeholder="Password"
           value={formData.password}
           onChange={handleChange}
-          className="border border-gray-300 p-2 rounded w-full mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className={`border p-2 rounded w-full mb-1 focus:outline-none focus:ring-2 ${
+            errors.password ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+          }`}
         />
+        {errors.password && <p className="text-red-500 text-sm mb-2">{errors.password}</p>}
 
         <button
           onClick={handleLogin}
           disabled={loading}
-          className={`w-full py-2 rounded text-white font-semibold ${
+          className={`w-full py-2 rounded text-white font-semibold mt-2 ${
             loading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700 transition"
@@ -76,6 +106,7 @@ const Login = () => {
           {loading ? "Logging in..." : "Login"}
         </button>
 
+        {/* Server-side error */}
         {error && <p className="text-red-500 mt-3 text-center">{error}</p>}
 
         <p className="text-center mt-4 text-gray-600">
