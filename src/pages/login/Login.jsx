@@ -16,11 +16,11 @@ const Login = () => {
     password: "",
   });
 
-  const [errors, setErrors] = useState({}); // validation errors
+  const [errors, setErrors] = useState({}); 
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" }); // clear error when typing
+    setErrors({ ...errors, [e.target.name]: "" }); 
   };
 
   const validateForm = () => {
@@ -81,7 +81,6 @@ const Login = () => {
         />
         {errors.email && <p className="text-red-500 text-sm mb-2">{errors.email}</p>}
 
-        {/* Password */}
         <input
           type="password"
           name="password"
@@ -97,7 +96,7 @@ const Login = () => {
         <button
           onClick={handleLogin}
           disabled={loading}
-          className={`w-full py-2 rounded text-white font-semibold mt-2 ${
+          className={`w-full py-2 rounded text-white font-semibold mt-2 cursor-pointer${
             loading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700 transition"
@@ -106,7 +105,6 @@ const Login = () => {
           {loading ? "Logging in..." : "Login"}
         </button>
 
-        {/* Server-side error */}
         {error && <p className="text-red-500 mt-3 text-center">{error}</p>}
 
         <p className="text-center mt-4 text-gray-600">

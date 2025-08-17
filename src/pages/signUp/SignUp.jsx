@@ -18,11 +18,11 @@ const Signup = () => {
     password: "",
   });
 
-  const [errors, setErrors] = useState({}); // store validation errors
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" }); // clear error when typing
+    setErrors({ ...errors, [e.target.name]: "" }); 
   };
 
   const validateForm = () => {
@@ -78,7 +78,6 @@ const Signup = () => {
       <div className="bg-white shadow-lg rounded-lg p-8 w-96">
         <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
 
-        {/* First Name */}
         <input
           type="text"
           name="firstname"
@@ -91,7 +90,6 @@ const Signup = () => {
         />
         {errors.firstname && <p className="text-red-500 text-sm mb-2">{errors.firstname}</p>}
 
-        {/* Last Name */}
         <input
           type="text"
           name="lastname"
@@ -104,7 +102,6 @@ const Signup = () => {
         />
         {errors.lastname && <p className="text-red-500 text-sm mb-2">{errors.lastname}</p>}
 
-        {/* Username */}
         <input
           type="text"
           name="username"
@@ -117,7 +114,6 @@ const Signup = () => {
         />
         {errors.username && <p className="text-red-500 text-sm mb-2">{errors.username}</p>}
 
-        {/* Email */}
         <input
           type="email"
           name="email"
@@ -130,7 +126,6 @@ const Signup = () => {
         />
         {errors.email && <p className="text-red-500 text-sm mb-2">{errors.email}</p>}
 
-        {/* Password */}
         <input
           type="password"
           name="password"
@@ -146,7 +141,7 @@ const Signup = () => {
         <button
           onClick={handleSignup}
           disabled={loading}
-          className={`w-full py-2 rounded text-white font-semibold mt-2 ${
+          className={`w-full py-2 rounded text-white font-semibold mt-2 cursor-pointer ${
             loading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700 transition"
