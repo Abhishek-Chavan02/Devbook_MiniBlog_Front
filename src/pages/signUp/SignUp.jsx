@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { signup } from "../../redux/actions/signUpAction";
+import { signup } from "../../redux/actions/SignUpAction";
 import { useNavigate, Link } from "react-router-dom";
 
 const Signup = () => {
