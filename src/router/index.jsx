@@ -4,7 +4,7 @@ import Login from '../pages/login/Login.jsx';
 import Home from '../pages/home/Home.jsx';
 import Profile from '../pages/home/Profile.jsx';
 import PrivateRoute from './PrivateRoute';
-import Signup from '../pages/signUp/signUp.jsx';
+import Signup from '../pages/signUp/SignUp.jsx';
 import UserManagement from '../pages/home/UserManagement.jsx'; 
 import Blog from '../pages/Blog/index.jsx';
 import HomeContent from '../pages/home/HomeContetnt.jsx';
