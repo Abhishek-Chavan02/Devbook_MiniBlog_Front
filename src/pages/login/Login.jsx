@@ -96,7 +96,7 @@ const Login = () => {
         <button
           onClick={handleLogin}
           disabled={loading}
-          className={`w-full py-2 rounded text-white font-semibold mt-2 cursor-pointer${
+          className={`w-full py-2 rounded text-white font-semibold mt-2 cursor-pointer ${
             loading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700 transition"
