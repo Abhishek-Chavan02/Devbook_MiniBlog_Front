@@ -22,7 +22,7 @@ export const login = (formData) => async (dispatch) => {
     dispatch({
       type: USER_LOGIN_FAIL,
       payload:
-        err.response?.data?.message || err.message || "Login failed",
+        err.response?.data?.message || err.message || "Wrong credentials",
     });
   }
 };

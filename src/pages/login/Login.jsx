@@ -63,6 +63,19 @@ const Login = () => {
     dispatch({ type: USER_SIGNUP_RESET });
   }, [dispatch]);
 
+  // Show SweetAlert for wrong credentials
+  useEffect(() => {
+    if (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: error === "Wrong credentials" ? "Wrong credentials" : error,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    }
+  }, [error]);
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg p-8 w-96">
@@ -105,7 +118,8 @@ const Login = () => {
           {loading ? "Logging in..." : "Login"}
         </button>
 
-        {error && <p className="text-red-500 mt-3 text-center">{error}</p>}
+        {/* Remove inline error message, since SweetAlert will show it */}
+        {/* {error && <p className="text-red-500 mt-3 text-center">{error}</p>} */}
 
         <p className="text-center mt-4 text-gray-600">
           Don't have an account?{" "}
