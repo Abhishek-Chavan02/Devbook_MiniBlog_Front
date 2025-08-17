@@ -7,6 +7,7 @@ import PrivateRoute from './PrivateRoute';
 import Signup from '../pages/signUp/signUp.jsx';
 import UserManagement from '../pages/home/UserManagement.jsx'; 
 import Blog from '../pages/Blog/index.jsx';
+import HomeContent from '../pages/home/HomeContetnt.jsx';
 
 const AppRouter = () => (
   <Routes>
@@ -15,6 +16,7 @@ const AppRouter = () => (
 
     {/* Private layout */}
     <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>}>
+      <Route index element={<HomeContent />} />
       <Route path="profile" element={<Profile />} />
       <Route path="user_list" element={<UserManagement />} />
       <Route path="blog" element={<Blog />} /> 

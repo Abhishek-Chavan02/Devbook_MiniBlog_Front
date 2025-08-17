@@ -20,10 +20,9 @@ const Home = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         <Header userInfo={userInfo} />
-
         {/* Outlet area */}
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-          <Outlet /> {/* Chat or Profile will render here */}
+          <Outlet /> 
         </div>
       </div>
     </div>

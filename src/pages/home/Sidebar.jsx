@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { UserIcon, LogoutIcon, MenuIcon, UsersIcon, PencilAltIcon } from "@heroicons/react/outline";
+import { UserIcon, LogoutIcon, MenuIcon, UsersIcon, PencilAltIcon, HomeIcon } from "@heroicons/react/outline";
 import { USER_LOGOUT } from "../../redux/constant";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
@@ -28,6 +28,11 @@ const handleLogout = () => {
 };
 
   let menuItems = [
+       {
+      name: "Home",
+      path: "/home",
+      icon: <HomeIcon className="h-5 w-5" />,
+    },
     {
       name: "Profile",
       path: "profile",
