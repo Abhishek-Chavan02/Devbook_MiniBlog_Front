@@ -5,7 +5,7 @@ import store from "../redux/store";
 const axiosInstance = axios.create({
   // baseURL: "http://localhost:3000",
   baseURL: "https://devbook-minibolg-backend.onrender.com",
-  timeout: 6000,
+  timeout: 10000,
 });
 
 axiosInstance.interceptors.request.use(
