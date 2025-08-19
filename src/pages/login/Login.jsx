@@ -54,7 +54,7 @@ const Login = () => {
         timer: 2000,
         showConfirmButton: false,
       }).then(() => {
-        navigate("/home");
+        navigate("/home", { replace: true });
       });
     }
   }, [userInfo, navigate]);
