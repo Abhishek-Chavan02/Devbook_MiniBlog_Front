@@ -3,8 +3,8 @@ import Swal from "sweetalert2";
 import store from "../redux/store";
 
 const axiosInstance = axios.create({
-  // baseURL: "http://localhost:3000",
-  baseURL: "https://devbook-minibolg-backend.onrender.com",
+  baseURL: "http://localhost:8000",
+  // baseURL: "https://devbook-minibolg-backend.onrender.com",
   timeout: 10000,
 });
 
