@@ -15,6 +15,7 @@ const Signup = () => {
     lastname: "",
     username: "",
     email: "",
+    mobile_no: "",
     password: "",
   });
 
@@ -22,12 +23,13 @@ const Signup = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" }); 
+    setErrors({ ...errors, [e.target.name]: "" });
   };
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.firstname.trim()) newErrors.firstname = "First name is required";
+    if (!formData.firstname.trim())
+      newErrors.firstname = "First name is required";
     if (!formData.lastname.trim()) newErrors.lastname = "Last name is required";
     if (!formData.username.trim()) newErrors.username = "Username is required";
     if (!formData.email.trim()) {
@@ -85,10 +87,14 @@ const Signup = () => {
           value={formData.firstname}
           onChange={handleChange}
           className={`border p-2 rounded w-full mb-1 focus:outline-none focus:ring-2 ${
-            errors.firstname ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+            errors.firstname
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-300 focus:ring-blue-500"
           }`}
         />
-        {errors.firstname && <p className="text-red-500 text-sm mb-2">{errors.firstname}</p>}
+        {errors.firstname && (
+          <p className="text-red-500 text-sm mb-2">{errors.firstname}</p>
+        )}
 
         <input
           type="text"
@@ -97,10 +103,14 @@ const Signup = () => {
           value={formData.lastname}
           onChange={handleChange}
           className={`border p-2 rounded w-full mb-1 focus:outline-none focus:ring-2 ${
-            errors.lastname ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+            errors.lastname
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-300 focus:ring-blue-500"
           }`}
         />
-        {errors.lastname && <p className="text-red-500 text-sm mb-2">{errors.lastname}</p>}
+        {errors.lastname && (
+          <p className="text-red-500 text-sm mb-2">{errors.lastname}</p>
+        )}
 
         <input
           type="text"
@@ -109,10 +119,14 @@ const Signup = () => {
           value={formData.username}
           onChange={handleChange}
           className={`border p-2 rounded w-full mb-1 focus:outline-none focus:ring-2 ${
-            errors.username ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+            errors.username
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-300 focus:ring-blue-500"
           }`}
         />
-        {errors.username && <p className="text-red-500 text-sm mb-2">{errors.username}</p>}
+        {errors.username && (
+          <p className="text-red-500 text-sm mb-2">{errors.username}</p>
+        )}
 
         <input
           type="email"
@@ -121,10 +135,31 @@ const Signup = () => {
           value={formData.email}
           onChange={handleChange}
           className={`border p-2 rounded w-full mb-1 focus:outline-none focus:ring-2 ${
-            errors.email ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+            errors.email
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-300 focus:ring-blue-500"
           }`}
         />
-        {errors.email && <p className="text-red-500 text-sm mb-2">{errors.email}</p>}
+        {errors.email && (
+          <p className="text-red-500 text-sm mb-2">{errors.email}</p>
+        )}
+
+        <input
+          type="tel"
+          name="mobile_no"
+          placeholder="Mobile Number"
+          value={formData.mobile_no}
+          onChange={handleChange}
+          className={`border p-2 rounded w-full mb-1 focus:outline-none focus:ring-2 ${
+            errors.mobile_no
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-300 focus:ring-blue-500"
+          }`}
+        />
+
+        {errors.mobile_no && (
+          <p className="text-red-500 text-sm mb-2">{errors.mobile_no}</p>
+        )}
 
         <input
           type="password"
@@ -133,10 +168,14 @@ const Signup = () => {
           value={formData.password}
           onChange={handleChange}
           className={`border p-2 rounded w-full mb-1 focus:outline-none focus:ring-2 ${
-            errors.password ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+            errors.password
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-300 focus:ring-blue-500"
           }`}
         />
-        {errors.password && <p className="text-red-500 text-sm mb-2">{errors.password}</p>}
+        {errors.password && (
+          <p className="text-red-500 text-sm mb-2">{errors.password}</p>
+        )}
 
         <button
           onClick={handleSignup}

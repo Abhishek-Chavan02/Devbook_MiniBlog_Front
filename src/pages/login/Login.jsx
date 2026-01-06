@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../../redux/actions/loginAction";
+import {
+  login,
+  sendOtpFunc,
+  verifyOtpfunc,
+} from "../../redux/actions/loginAction";
 import { useNavigate, Link } from "react-router-dom";
 import { USER_SIGNUP_RESET } from "../../redux/constant";
 import Swal from "sweetalert2";
@@ -8,19 +12,32 @@ import Swal from "sweetalert2";
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [withOtp, setWithOtp] = useState(false);
+  const [otpTimer, setOtpTimer] = useState(60);
+  const [timeStarted, setTimeStarted] = useState(false);
 
   const { loading, error, userInfo } = useSelector((state) => state.userLogin);
+  const {
+    loading: sendOtpLoading,
+    error: sendOtpError,
+    success: sendOtpSuccess,
+    otpData,
+  } = useSelector((state) => state.sendOtp);
+  console.log(otpData?.otpToken);
 
+
+  
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    mobile_no: "",
+    otp: "",
   });
-
-  const [errors, setErrors] = useState({}); 
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" }); 
+    setErrors({ ...errors, [e.target.name]: "" });
   };
 
   const validateForm = () => {
@@ -35,6 +52,15 @@ const Login = () => {
     }
     return newErrors;
   };
+  const validateOtpForm = () => {
+    const newErrors = {};
+    if (!formData.mobile_no.trim()) {
+      newErrors.mobile_no = "Mobile number is required";
+    } else if (!/^[6-9]\d{9}$/.test(formData.mobile_no)) {
+      newErrors.mobile_no = "Invalid mobile number";
+    }
+    return newErrors;
+  };
 
   const handleLogin = () => {
     const validationErrors = validateForm();
@@ -44,6 +70,36 @@ const Login = () => {
     }
     dispatch(login(formData));
   };
+
+ const handleOtpLogin = () => {
+  const otpValue = formData.otp.trim();
+
+  const otpTokenValue = localStorage.getItem("otpToken");
+
+  dispatch(
+    verifyOtpfunc(  { otp: otpValue, otpToken: otpTokenValue }, navigate )
+  );
+};
+
+
+const sendOtp = async () => {
+  const validationErrors = validateOtpForm();
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    return;
+  }
+
+  // Start the timer
+  startOtpTimer();
+
+  // Dispatch action to send OTP
+   await dispatch(sendOtpFunc(formData));
+
+  if (otpData && otpData?.otpToken) {
+    localStorage.setItem("otpToken", otpData?.otpToken);
+  }
+};
+
 
   useEffect(() => {
     if (userInfo) {
@@ -76,50 +132,159 @@ const Login = () => {
     }
   }, [error]);
 
+  const startOtpTimer = () => {
+    setTimeStarted(true);
+    setOtpTimer(60);
+
+    const interval = setInterval(() => {
+      setOtpTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setTimeStarted(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white shadow-lg rounded-lg p-8 w-96">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
         {/* Email */}
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          className={`border p-2 rounded w-full mb-1 focus:outline-none focus:ring-2 ${
-            errors.email ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
-          }`}
-        />
-        {errors.email && <p className="text-red-500 text-sm mb-2">{errors.email}</p>}
+        {/* Email & Password or OTP Inputs */}
+        {withOtp ? (
+          <>
+            <input
+              type="tel"
+              name="mobile_no"
+              placeholder="Mobile Number"
+              value={formData.mobile_no}
+              onChange={handleChange}
+              className={`border p-2 rounded w-full mb-1 focus:outline-none focus:ring-2 ${
+                errors.mobile_no
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-blue-500"
+              }`}
+            />
+            {errors.mobile_no && (
+              <p className="text-red-500 text-sm mb-2">{errors.mobile_no}</p>
+            )}
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          className={`border p-2 rounded w-full mb-1 focus:outline-none focus:ring-2 ${
-            errors.password ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+            <input
+              type="number"
+              name="otp"
+              placeholder="Otp"
+              value={formData.otp}
+              onChange={handleChange}
+              className={`border p-2 rounded w-full mb-1 focus:outline-none focus:ring-2 ${
+                errors.otp
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-blue-500"
+              }`}
+            />
+            {errors.otp && (
+              <p className="text-red-500 text-sm mb-2">{errors.otp}</p>
+            )}
+            {timeStarted && otpTimer > 0 && (
+              <p className="text-center text-sm text-gray-700 mt-2">
+                OTP expires in: <span className="font-bold">{otpTimer}s</span>
+              </p>
+            )}
+
+            {timeStarted && otpTimer === 0 && (
+              <p className="text-center text-sm text-red-600 mt-2 font-semibold">
+                OTP expired! Please resend OTP.
+              </p>
+            )}
+          </>
+        ) : (
+          <>
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              className={`border p-2 rounded w-full mb-1 focus:outline-none focus:ring-2 ${
+                errors.email
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-blue-500"
+              }`}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mb-2">{errors.email}</p>
+            )}
+
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              className={`border p-2 rounded w-full mb-1 focus:outline-none focus:ring-2 ${
+                errors.password
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-blue-500"
+              }`}
+            />
+            {errors.password && (
+              <p className="text-red-500 text-sm mb-2">{errors.password}</p>
+            )}
+          </>
+        )}
+
+        {withOtp && (
+          <button
+            onClick={sendOtp}
+            disabled={timeStarted}
+            className={`w-full py-2 rounded text-white font-semibold mt-2 ${
+              timeStarted
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
           }`}
-        />
-        {errors.password && <p className="text-red-500 text-sm mb-2">{errors.password}</p>}
+          >
+            Send OTP
+          </button>
+        )}
 
         <button
-          onClick={handleLogin}
+          onClick={withOtp ? handleOtpLogin : handleLogin}
           disabled={loading}
-          className={`w-full py-2 rounded text-white font-semibold mt-2 cursor-pointer ${
+          className={`w-full py-2 rounded text-white font-semibold mt-2 ${
             loading
               ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 transition"
+              : "bg-blue-600 hover:bg-blue-700"
           }`}
         >
           {loading ? "Logging in..." : "Login"}
         </button>
 
-        {/* Remove inline error message, since SweetAlert will show it */}
-        {/* {error && <p className="text-red-500 mt-3 text-center">{error}</p>} */}
+        {withOtp ? (
+          <>
+            <p className="text-center mt-4 text-gray-600">
+              Login with password{" "}
+              <button
+                className="text-blue-600 hover:underline cursor-pointer"
+                onClick={() => setWithOtp(false)}
+              >
+                Sign Up
+              </button>
+            </p>
+          </>
+        ) : (
+          <p className="text-center mt-4 text-gray-600">
+            Login with OTP{" "}
+            <button
+              className="text-blue-600 hover:underline cursor-pointer"
+              onClick={() => setWithOtp(true)}
+            >
+              Sign Up
+            </button>
+          </p>
+        )}
 
         <p className="text-center mt-4 text-gray-600">
           Don't have an account?{" "}
