@@ -6,6 +6,9 @@ import {
   OTP_SEND_REQUEST,
   OTP_SEND_SUCCESS,
   OTP_SEND_FAIL,
+  VERIFY_OTP_REQUEST,
+  VERIFY_OTP_SUCCESS,
+  VERIFY_OTP_FAIL,
 } from "../constant";
 
 const userFromStorage = localStorage.getItem("userInfo")
@@ -26,6 +29,15 @@ export const loginReducer = (state = initialState, action) => {
 
     case USER_LOGIN_SUCCESS:
       return { ...state, loading: false, userInfo: action.payload.user, error: null };
+
+    case VERIFY_OTP_REQUEST:
+      return { ...state, loading: true, error: null };
+
+    case VERIFY_OTP_SUCCESS:
+      return { ...state, loading: false, userInfo: action.payload.user, error: null };
+
+    case VERIFY_OTP_FAIL:
+      return { ...state, loading: false, error: action.payload };
 
     case USER_LOGIN_FAIL:
       return { ...state, loading: false, error: action.payload };

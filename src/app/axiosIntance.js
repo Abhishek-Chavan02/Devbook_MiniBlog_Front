@@ -27,6 +27,8 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401 && !isLoginRequest) {
       localStorage.removeItem("token");
       localStorage.removeItem("userInfo");
+      localStorage.removeItem("otpToken");
+
 
       if (store) {
         store.dispatch({ type: "USER_LOGOUT" });

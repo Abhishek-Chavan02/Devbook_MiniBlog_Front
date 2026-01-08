@@ -13,14 +13,11 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [withOtp, setWithOtp] = useState(false);
-  const [otpTimer, setOtpTimer] = useState(60);
+  const [otpTimer, setOtpTimer] = useState(300);
   const [timeStarted, setTimeStarted] = useState(false);
 
   const { loading, error, userInfo } = useSelector((state) => state.userLogin);
   const {
-    loading: sendOtpLoading,
-    error: sendOtpError,
-    success: sendOtpSuccess,
     otpData,
   } = useSelector((state) => state.sendOtp);
   console.log(otpData?.otpToken);
@@ -73,9 +70,7 @@ const Login = () => {
 
  const handleOtpLogin = () => {
   const otpValue = formData.otp.trim();
-
   const otpTokenValue = localStorage.getItem("otpToken");
-
   dispatch(
     verifyOtpfunc(  { otp: otpValue, otpToken: otpTokenValue }, navigate )
   );
@@ -89,10 +84,8 @@ const sendOtp = async () => {
     return;
   }
 
-  // Start the timer
   startOtpTimer();
 
-  // Dispatch action to send OTP
    await dispatch(sendOtpFunc(formData));
 
   if (otpData && otpData?.otpToken) {
@@ -134,7 +127,7 @@ const sendOtp = async () => {
 
   const startOtpTimer = () => {
     setTimeStarted(true);
-    setOtpTimer(60);
+    setOtpTimer(300);
 
     const interval = setInterval(() => {
       setOtpTimer((prev) => {

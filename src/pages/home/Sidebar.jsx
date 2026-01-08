@@ -23,6 +23,8 @@ const handleLogout = () => {
     dispatch({ type: USER_LOGOUT });
     localStorage.removeItem("token");
     localStorage.removeItem("userInfo");
+    localStorage.removeItem("otpToken");
+
     navigate("/login");
   });
 };
